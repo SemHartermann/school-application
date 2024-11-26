@@ -1,0 +1,1034 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="create-users-table" author="Kyrylo-Fursov">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="users">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="role" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="account_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="verification_token" type="varchar(255)">
+                <constraints unique="true"/>
+            </column>
+
+            <column name="token_expiry_date" type="datetime"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-students-table" author="Millrocious">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="students"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="students">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="phone" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="deleted" type="boolean" defaultValue="false"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-students" author="Millrocious">
+
+        <createIndex tableName="students" indexName="idx_students_deleted">
+            <column name="deleted"/>
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet id="create-lessons-table" author="Oleh Kashetskyi">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lessons"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="lessons">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="date" type="date">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="period" type="int">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="homework" type="varchar(255)"/>
+
+            <column name="module_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="deleted" type="boolean" defaultValue="false"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-lessons" author="Oleh Kashetskyi">
+        <createIndex tableName="lessons" indexName="idx_lessons_deleted">
+            <column name="deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create-parents-table" author="Stepan">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="parents"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="parents">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="deleted" type="boolean" defaultValue="false"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="create-parents-children-table" author="Stepan">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="parents_children"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="parents_children">
+            <column name="parent_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="children_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="add-foreign-key-constraint-parents-children-student_id" author="Stepan">
+
+        <addForeignKeyConstraint baseTableName="parents_children"
+                                 baseColumnNames="children_id"
+                                 constraintName="fk_parents_students_student_id"
+                                 referencedTableName="students"
+                                 referencedColumnNames="id"/>
+
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-parents" author="Stepan">
+        <createIndex tableName="parents" indexName="idx_parents_deleted">
+            <column name="deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create-teachers-table" author="SashaBasarab">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="teachers"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="teachers">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="email" type="varchar(255)">
+                <constraints unique="true"/>
+            </column>
+
+            <column name="phone" type="varchar(255)">
+                <constraints unique="true"/>
+            </column>
+
+            <column name="deleted" type="boolean" defaultValue="false"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-teachers" author="SashaBasarab">
+        <createIndex tableName="teachers" indexName="idx_teachers_deleted">
+            <column name="deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create-subjects-table" author="Volodymyr Yamnyi">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="subjects"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="subjects">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="deleted" type="boolean" defaultValue="false"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-subjects" author="Volodymyr Yamnyi">
+        <createIndex tableName="subjects" indexName="idx_subjects_deleted">
+            <column name="deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create-classGroup-table" author="SashaBushyn">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="class_group"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="class_group">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="deleted" type="boolean" defaultValue="false"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-class_group" author="SashaBasarab">
+        <createIndex tableName="class_group" indexName="idx_classGroup_deleted">
+            <column name="deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create-class-group-students-table" author="SashaBushyn">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="class_group_students"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="class_group_students">
+
+            <column name="class_group_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="students_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="create-class-group-subject-table" author="SashaBushyn">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="class_group_subject"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="class_group_subject">
+
+            <column name="class_group_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="subject_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="create-class-group-teacher-list-table" author="SashaBushyn">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="class_group_teacher_list"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="class_group_teacher_list">
+
+            <column name="class_group_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="teacher_list_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="create-teachers_subjects_classes-table" author="SashaBasarab">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="teachers_subjects_classes"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="teachers_subjects_classes">
+
+            <column name="teacher_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="subject_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="class_group_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add-unique-constraint-to-subjects-table" author="SashaBasarab">
+        <addUniqueConstraint tableName="subjects" columnNames="id" constraintName="subjects_id_unique"/>
+    </changeSet>
+
+    <changeSet id="add-fk-to-teachers_subjects_classes-table" author="SashaBasarab">
+
+        <addForeignKeyConstraint baseTableName="teachers_subjects_classes"
+                                 baseColumnNames="teacher_id"
+                                 constraintName="fk_teacher"
+                                 referencedTableName="teachers"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="teachers_subjects_classes"
+                                 baseColumnNames="subject_id"
+                                 constraintName="fk_subject"
+                                 referencedTableName="subjects"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="teachers_subjects_classes"
+                                 baseColumnNames="class_group_id"
+                                 constraintName="fk_class_group"
+                                 referencedTableName="class_group"
+                                 referencedColumnNames="id"/>
+
+    </changeSet>
+
+    <changeSet id="create-medicalRecords-table" author="Volodymyr Yamnyi">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="medical_records"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="medical_records">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="health_group" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="allergies" type="varchar(255)"/>
+
+            <column name="info" type="varchar(255)"/>
+
+            <column name="deleted" type="boolean" defaultValue="false"/>
+
+            <column name="student_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-medical_records" author="Volodymyr Yamnyi">
+        <createIndex tableName="medical_records" indexName="idx_medicalRecords_deleted">
+            <column name="deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="add-fk-to-medical_records-table" author="Volodymyr Yamnyi">
+
+        <addForeignKeyConstraint baseTableName="medical_records"
+                                 baseColumnNames="student_id"
+                                 constraintName="fk_student"
+                                 referencedTableName="students"
+                                 referencedColumnNames="id"/>
+
+    </changeSet>
+
+    <changeSet id="create-grades-table" author="Volodymyr Havryliuk">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="grades"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="grades">
+
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="student_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="lesson_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="grade_value" type="int">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="grade_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="add-fk-to-grades-table" author="Volodymyr Havryliuk">
+
+        <addForeignKeyConstraint baseTableName="grades"
+                                 baseColumnNames="student_id"
+                                 constraintName="fk_student"
+                                 referencedTableName="students"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="grades"
+                                 baseColumnNames="lesson_id"
+                                 constraintName="fk_lesson"
+                                 referencedTableName="lessons"
+                                 referencedColumnNames="id"/>
+
+    </changeSet>
+
+    <changeSet id="create-modules-table" author="Bohdan">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="modules"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="modules">
+
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+
+            <column name="subject_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="class_room_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="teacher_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="start_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="end_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="schedule" type="jsonb"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="updated_at" type="timestamp"/>
+
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-modules" author="Bohdan">
+
+        <createIndex tableName="modules" indexName="idx_modules_deleted">
+            <column name="deleted"/>
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet id="create-attendances-table" author="Millrocious">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="attendances"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="attendances">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="lesson_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="student_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="attendance_type" type="smallint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_attendances_lesson"
+                                 baseTableName="attendances" baseColumnNames="lesson_id"
+                                 referencedTableName="lessons" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_attendances_student"
+                                 baseTableName="attendances" baseColumnNames="student_id"
+                                 referencedTableName="students" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="add-deleted-column-index-attendances" author="Millrocious">
+
+        <createIndex tableName="attendances" indexName="idx_attendances_deleted">
+            <column name="deleted"/>
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet id="create-quartz-tables" author="Sem Zhivotov" dbms="postgresql">
+        <sql>
+            CREATE TABLE qrtz_job_details
+            (
+                SCHED_NAME        VARCHAR(120) NOT NULL,
+                JOB_NAME          VARCHAR(200) NOT NULL,
+                JOB_GROUP         VARCHAR(200) NOT NULL,
+                DESCRIPTION       VARCHAR(250) NULL,
+                JOB_CLASS_NAME    VARCHAR(250) NOT NULL,
+                IS_DURABLE        BOOL         NOT NULL,
+                IS_NONCONCURRENT  BOOL         NOT NULL,
+                IS_UPDATE_DATA    BOOL         NOT NULL,
+                REQUESTS_RECOVERY BOOL         NOT NULL,
+                JOB_DATA          BYTEA        NULL,
+                PRIMARY KEY (SCHED_NAME, JOB_NAME, JOB_GROUP)
+            );
+
+            CREATE TABLE qrtz_triggers
+            (
+                SCHED_NAME     VARCHAR(120) NOT NULL,
+                TRIGGER_NAME   VARCHAR(200) NOT NULL,
+                TRIGGER_GROUP  VARCHAR(200) NOT NULL,
+                JOB_NAME       VARCHAR(200) NOT NULL,
+                JOB_GROUP      VARCHAR(200) NOT NULL,
+                DESCRIPTION    VARCHAR(250) NULL,
+                NEXT_FIRE_TIME BIGINT       NULL,
+                PREV_FIRE_TIME BIGINT       NULL,
+                PRIORITY       INTEGER      NULL,
+                TRIGGER_STATE  VARCHAR(16)  NOT NULL,
+                TRIGGER_TYPE   VARCHAR(8)   NOT NULL,
+                START_TIME     BIGINT       NOT NULL,
+                END_TIME       BIGINT       NULL,
+                CALENDAR_NAME  VARCHAR(200) NULL,
+                MISFIRE_INSTR  SMALLINT     NULL,
+                JOB_DATA       BYTEA        NULL,
+                PRIMARY KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP),
+                FOREIGN KEY (SCHED_NAME, JOB_NAME, JOB_GROUP)
+                    REFERENCES QRTZ_JOB_DETAILS (SCHED_NAME, JOB_NAME, JOB_GROUP)
+            );
+
+            CREATE TABLE qrtz_simple_triggers
+            (
+                SCHED_NAME      VARCHAR(120) NOT NULL,
+                TRIGGER_NAME    VARCHAR(200) NOT NULL,
+                TRIGGER_GROUP   VARCHAR(200) NOT NULL,
+                REPEAT_COUNT    BIGINT       NOT NULL,
+                REPEAT_INTERVAL BIGINT       NOT NULL,
+                TIMES_TRIGGERED BIGINT       NOT NULL,
+                PRIMARY KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP),
+                FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+                    REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+            );
+
+            CREATE TABLE qrtz_cron_triggers
+            (
+                SCHED_NAME      VARCHAR(120) NOT NULL,
+                TRIGGER_NAME    VARCHAR(200) NOT NULL,
+                TRIGGER_GROUP   VARCHAR(200) NOT NULL,
+                CRON_EXPRESSION VARCHAR(120) NOT NULL,
+                TIME_ZONE_ID    VARCHAR(80),
+                PRIMARY KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP),
+                FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+                    REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+            );
+
+            CREATE TABLE qrtz_simprop_triggers
+            (
+                SCHED_NAME    VARCHAR(120)   NOT NULL,
+                TRIGGER_NAME  VARCHAR(200)   NOT NULL,
+                TRIGGER_GROUP VARCHAR(200)   NOT NULL,
+                STR_PROP_1    VARCHAR(512)   NULL,
+                STR_PROP_2    VARCHAR(512)   NULL,
+                STR_PROP_3    VARCHAR(512)   NULL,
+                INT_PROP_1    INT            NULL,
+                INT_PROP_2    INT            NULL,
+                LONG_PROP_1   BIGINT         NULL,
+                LONG_PROP_2   BIGINT         NULL,
+                DEC_PROP_1    NUMERIC(13, 4) NULL,
+                DEC_PROP_2    NUMERIC(13, 4) NULL,
+                BOOL_PROP_1   BOOL           NULL,
+                BOOL_PROP_2   BOOL           NULL,
+                PRIMARY KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP),
+                FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+                    REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+            );
+
+            CREATE TABLE qrtz_blob_triggers
+            (
+                SCHED_NAME    VARCHAR(120) NOT NULL,
+                TRIGGER_NAME  VARCHAR(200) NOT NULL,
+                TRIGGER_GROUP VARCHAR(200) NOT NULL,
+                BLOB_DATA     BYTEA        NULL,
+                PRIMARY KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP),
+                FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+                    REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+            );
+
+            CREATE TABLE qrtz_calendars
+            (
+                SCHED_NAME    VARCHAR(120) NOT NULL,
+                CALENDAR_NAME VARCHAR(200) NOT NULL,
+                CALENDAR      BYTEA        NOT NULL,
+                PRIMARY KEY (SCHED_NAME, CALENDAR_NAME)
+            );
+
+
+            CREATE TABLE qrtz_paused_trigger_grps
+            (
+                SCHED_NAME    VARCHAR(120) NOT NULL,
+                TRIGGER_GROUP VARCHAR(200) NOT NULL,
+                PRIMARY KEY (SCHED_NAME, TRIGGER_GROUP)
+            );
+
+            CREATE TABLE qrtz_fired_triggers
+            (
+                SCHED_NAME        VARCHAR(120) NOT NULL,
+                ENTRY_ID          VARCHAR(95)  NOT NULL,
+                TRIGGER_NAME      VARCHAR(200) NOT NULL,
+                TRIGGER_GROUP     VARCHAR(200) NOT NULL,
+                INSTANCE_NAME     VARCHAR(200) NOT NULL,
+                FIRED_TIME        BIGINT       NOT NULL,
+                SCHED_TIME        BIGINT       NOT NULL,
+                PRIORITY          INTEGER      NOT NULL,
+                STATE             VARCHAR(16)  NOT NULL,
+                JOB_NAME          VARCHAR(200) NULL,
+                JOB_GROUP         VARCHAR(200) NULL,
+                IS_NONCONCURRENT  BOOL         NULL,
+                REQUESTS_RECOVERY BOOL         NULL,
+                PRIMARY KEY (SCHED_NAME, ENTRY_ID)
+            );
+
+            CREATE TABLE qrtz_scheduler_state
+            (
+                SCHED_NAME        VARCHAR(120) NOT NULL,
+                INSTANCE_NAME     VARCHAR(200) NOT NULL,
+                LAST_CHECKIN_TIME BIGINT       NOT NULL,
+                CHECKIN_INTERVAL  BIGINT       NOT NULL,
+                PRIMARY KEY (SCHED_NAME, INSTANCE_NAME)
+            );
+
+            CREATE TABLE qrtz_locks
+            (
+                SCHED_NAME VARCHAR(120) NOT NULL,
+                LOCK_NAME  VARCHAR(40)  NOT NULL,
+                PRIMARY KEY (SCHED_NAME, LOCK_NAME)
+            );
+
+            create index idx_qrtz_j_req_recovery on qrtz_job_details (SCHED_NAME, REQUESTS_RECOVERY);
+            create index idx_qrtz_j_grp on qrtz_job_details (SCHED_NAME, JOB_GROUP);
+
+            create index idx_qrtz_t_j on qrtz_triggers (SCHED_NAME, JOB_NAME, JOB_GROUP);
+            create index idx_qrtz_t_jg on qrtz_triggers (SCHED_NAME, JOB_GROUP);
+            create index idx_qrtz_t_c on qrtz_triggers (SCHED_NAME, CALENDAR_NAME);
+            create index idx_qrtz_t_g on qrtz_triggers (SCHED_NAME, TRIGGER_GROUP);
+            create index idx_qrtz_t_state on qrtz_triggers (SCHED_NAME, TRIGGER_STATE);
+            create index idx_qrtz_t_n_state on qrtz_triggers (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP, TRIGGER_STATE);
+            create index idx_qrtz_t_n_g_state on qrtz_triggers (SCHED_NAME, TRIGGER_GROUP, TRIGGER_STATE);
+            create index idx_qrtz_t_next_fire_time on qrtz_triggers (SCHED_NAME, NEXT_FIRE_TIME);
+            create index idx_qrtz_t_nft_st on qrtz_triggers (SCHED_NAME, TRIGGER_STATE, NEXT_FIRE_TIME);
+            create index idx_qrtz_t_nft_misfire on qrtz_triggers (SCHED_NAME, MISFIRE_INSTR, NEXT_FIRE_TIME);
+            create index idx_qrtz_t_nft_st_misfire on qrtz_triggers (SCHED_NAME, MISFIRE_INSTR, NEXT_FIRE_TIME, TRIGGER_STATE);
+            create index idx_qrtz_t_nft_st_misfire_grp on qrtz_triggers (SCHED_NAME, MISFIRE_INSTR, NEXT_FIRE_TIME, TRIGGER_GROUP, TRIGGER_STATE);
+
+            create index idx_qrtz_ft_trig_inst_name on qrtz_fired_triggers (SCHED_NAME, INSTANCE_NAME);
+            create index idx_qrtz_ft_inst_job_req_rcvry on qrtz_fired_triggers (SCHED_NAME, INSTANCE_NAME, REQUESTS_RECOVERY);
+            create index idx_qrtz_ft_j_g on qrtz_fired_triggers (SCHED_NAME, JOB_NAME, JOB_GROUP);
+            create index idx_qrtz_ft_jg on qrtz_fired_triggers (SCHED_NAME, JOB_GROUP);
+            create index idx_qrtz_ft_t_g on qrtz_fired_triggers (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+            create index idx_qrtz_ft_tg on qrtz_fired_triggers (SCHED_NAME, TRIGGER_GROUP);
+        </sql>
+    </changeSet>
+
+    <changeSet id="change-attendance-type-column-data-type-to-varchar" author="Volodymyr Yamnyi">
+
+        <modifyDataType
+                columnName="attendance_type"
+                newDataType="varchar(10)"
+                schemaName="public"
+                tableName="attendances"/>
+    </changeSet>
+
+    <changeSet id="add-unique-constraint-to-phone-column-of-students-table" author="Volodymyr Yamnyi">
+        <addUniqueConstraint
+                columnNames="phone"
+                constraintName="students_phone_key"
+                schemaName="public"
+                tableName="students"/>
+    </changeSet>
+
+    <changeSet id="add-autoincrement-to-pk-column-of-grade-table" author="Volodymyr Havryliuk">
+        <addAutoIncrement
+                columnDataType="bigint"
+                columnName="id"
+                incrementBy="1"
+                schemaName="public"
+                tableName="grades"/>
+    </changeSet>
+
+    <changeSet id="modify-data-type-in-lessons-table-column-date" author="Sem Zhivotov">
+
+        <modifyDataType
+                columnName="date"
+                newDataType="datetime"
+                schemaName="public"
+                tableName="lessons"/>
+    </changeSet>
+
+
+    <changeSet id="create-post-table" author="Ksenia">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="posts"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="posts">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="class_group_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="title" type="varchar(255)"/>
+
+            <column name="content" type="varchar(255)"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+
+            <column name="updated_by" type="bigint"/>
+
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_posts_user"
+                                 baseTableName="posts" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_posts_class_group"
+                                 baseTableName="posts" baseColumnNames="class_group_id"
+                                 referencedTableName="class_group" referencedColumnNames="id"/>
+    </changeSet>
+
+
+    <changeSet id="create-reactions-table" author="Serhii Kohut">
+
+        <preConditions>
+            <not>
+                <tableExists tableName="reactions"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="reactions">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_reactions_post"
+                                 baseTableName="reactions" baseColumnNames="post_id"
+                                 referencedTableName="posts" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_reactions_user"
+                                 baseTableName="reactions" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="create-comments-table" author="Volodymyr Havryliuk">
+        <preConditions>
+            <not>
+                <tableExists tableName="comments"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="comments">
+            <column name = "id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name = "comment_parent_id" type="bigint" />
+            <column name = "user_id" type = "bigint" >
+                <constraints nullable="false" />
+            </column>
+            <column name = "post_id" type = "bigint" >
+                <constraints nullable="false" />
+            </column>
+            <column name = "text" type = "varchar(255)" >
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_comments_post"
+                                 baseTableName="comments" baseColumnNames="post_id"
+                                 referencedTableName="posts" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_comments_user"
+                                 baseTableName="comments" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_comment_children_comment_parents"
+                                 baseTableName="comments" baseColumnNames="comment_parent_id"
+                                 referencedTableName="comments" referencedColumnNames="id"/>
+    </changeSet>
+    <changeSet id="add-date-grade-column" author="Stepan">
+        <addColumn tableName="grades">
+            <column name="date" type="datetime"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="drop-NotNull-constraint-lesson-id-column-grades-table" author="Stepan">
+        <dropNotNullConstraint tableName="grades" columnName="lesson_id" columnDataType="bigint"/>
+    </changeSet>
+
+</databaseChangeLog>

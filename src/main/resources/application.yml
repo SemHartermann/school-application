@@ -1,0 +1,65 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/main-changelog.xml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/school-application
+    username: root
+    password: root
+    driverClassName: org.postgresql.Driver
+  quartz:
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            useProperties: true
+            tablePrefix: QRTZ_
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  config:
+    activate:
+      on-cloud-platform:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: testinventorsoft@gmail.com
+    password: abmo jtvp bydr uhyy
+  cloud:
+    gcp:
+      project-id: ${GCP_PROJECT_ID:inv8t-school-project}
+      credentials:
+        location: ${GOOGLE_APPLICATION_CREDENTIALS:classpath:storage_key.json}
+        bucketName: ${GCS_BUCKET_NAME:school_storage_general}
+
+message:
+  regSuccessful: "Your registration was successful!"
+
+verification:
+  token:
+    expiration: 1440 # Value in minutes, 60 * 24 (one day)
+
+auth:
+  message:
+    confirmed: Your account has been confirmed.
+    invalidToken: The provided token is invalid.
+    expired: The token has expired.
+    tokenNotFound: No token found.
+
+application:
+  security:
+    jwt:
+      secret-key: koxelJPNOmdGTDaHkqL1D+vAhA9PXiddCi00q1UDEL0TEoB3RxlKQ1p0bPX9esoJjNWqL6yoPwjjBhbqPOpRXTZl4ceDypJaEsjVFJgp+LE=
+      access-token-expiration: 1800000 # half an hour
+      refresh-token-expiration: 86400000 # one day
+  trigger:
+    cron:
+      lesson: "1 0 * ? 6 *"
+
+scheduling:
+  daily-report-cron: "0 0 18 * * MON-FRI"  # Runs at 6:00 PM, Monday to Friday
+
