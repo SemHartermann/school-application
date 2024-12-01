@@ -21,9 +21,6 @@
     <li><strong>Spring Boot</strong>: Framework for application development.</li>
     <li><strong>Spring Data JPA</strong>: For data persistence.</li>
     <li><strong>Spring Security</strong>: Managing authentication and authorization.</li>
-    <li><strong>Spring Boot Starter Web</strong>: To build web applications and RESTful services.</li>
-    <li><strong>Spring Boot Starter Validation</strong>: For request validation.</li>
-    <li><strong>Spring Boot Starter Jooq</strong>: For SQL generation and execution.</li>
     <li><strong>PostgreSQL</strong>: The database used.</li>
     <li><strong>MapStruct</strong>: For object mapping.</li>
     <li><strong>Lombok</strong>: To reduce boilerplate code.</li>
